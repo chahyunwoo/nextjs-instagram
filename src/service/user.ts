@@ -10,6 +10,8 @@ interface OAuthUser {
 }
 
 export async function addUser({ id, username, email, name, image }: OAuthUser) {
+  const existingUsers = await client.fetch(`*[_type == "user"]{_id}`);
+
   return client.createIfNotExists({
     _id: id,
     _type: "user",
@@ -17,7 +19,11 @@ export async function addUser({ id, username, email, name, image }: OAuthUser) {
     email,
     name,
     image,
-    following: [],
+    // following: []
+    following: existingUsers.map((user: { _id: string }) => ({
+      _ref: user._id,
+      _type: "reference",
+    })),
     followers: [],
     bookmarks: [],
   });
