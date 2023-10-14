@@ -22,7 +22,7 @@ export default function SideBar({ user }: IProps) {
         Language
       </p>
       <p className="font-bold mt-8 text-sm text-neutral-500">
-        &copy; Copyright INSTANTGRM from METAL
+        &copy; Copyright GRAM from Chahyunwoo
       </p>
     </>
   );
