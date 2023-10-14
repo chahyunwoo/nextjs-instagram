@@ -18,7 +18,7 @@ export default function Header() {
       <div className="max-w-screen-xl mx-auto">
         <div className="flex justify-between items-center px-6">
           <Link href="/">
-            <h1 className="text-2xl font-bold">INSTANTGRAM</h1>
+            <h1 className="text-lg font-bold">INSTANTGRAM</h1>
           </Link>
           <nav>
             <ul className="flex gap-4 items-center p-4">
