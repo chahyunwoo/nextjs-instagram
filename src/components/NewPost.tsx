@@ -122,7 +122,7 @@ export default function NewPost({ user: { username, image } }: IProps) {
           {file && (
             <div className="relative w-full aspect-square">
               <Image
-                className="object-cover"
+                objectFit="cover"
                 src={URL.createObjectURL(file)}
                 alt="local file"
                 fill
@@ -132,7 +132,7 @@ export default function NewPost({ user: { username, image } }: IProps) {
           )}
         </label>
         <textarea
-          className="outline-none text-lg border border-neutral-300 mb-2"
+          className="outline-none text-lg border border-neutral-300 mb-2 mt-20 md:mt-0"
           name="text"
           id="input-text"
           required
