@@ -126,7 +126,7 @@ export default function NewPost({ user: { username, image } }: IProps) {
                 src={URL.createObjectURL(file)}
                 alt="local file"
                 fill
-                sizes="650"
+                sizes="650px"
               />
             </div>
           )}
