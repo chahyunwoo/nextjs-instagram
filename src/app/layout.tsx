@@ -5,14 +5,14 @@ import Header from "@/components/Header";
 import AuthContext from "@/context/AuthContext";
 import SWRConfigContext from "@/context/SWRConfigContext";
 
-const openSans = Open_Sans({ subsets: ["latin"] });
+const sans = Open_Sans({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
-    default: "Instantgram",
-    template: "Instantgram | %s",
+    default: "Stargram",
+    template: "Stargram | %s",
   },
-  description: "Instantgram Photos",
+  description: "Stargram Photos",
 };
 
 export default function RootLayout({
@@ -21,16 +21,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body
-        className={`${openSans.className} w-full bg-neutral-50 overflow-auto`}
-      >
+    <html lang="ko">
+      <body className={`${sans.className} bg-black text-neutral-100`}>
         <AuthContext>
-          <Header />
-          <main className="w-full flex justify-center max-w-screen-xl mx-auto">
-            <SWRConfigContext>{children}</SWRConfigContext>
-          </main>
+          <SWRConfigContext>
+            <Header />
+            <main className="w-full h-full md:pl-16">{children}</main>
+          </SWRConfigContext>
         </AuthContext>
+
         <div id="portal" />
       </body>
     </html>

@@ -1,19 +1,25 @@
-import { follow, unfollow } from "@/service/posts";
-import { withSessionUser } from "@/utils/session";
+import { follow, unfollow } from "@/service/user";
+import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
+import { authOptions } from "../auth/[...nextauth]/route";
 
 export async function PUT(req: NextRequest) {
-  return withSessionUser(async (user) => {
-    const { id: targetId, follow: isFollow } = await req.json();
+  const session = await getServerSession(authOptions);
+  const user = session?.user;
 
-    if (!targetId || isFollow == null) {
-      return new Response("Bad Request", { status: 400 });
-    }
+  if (!user) {
+    return new Response("Authentication Error", { status: 401 });
+  }
 
-    const request = isFollow ? follow : unfollow;
+  const { id: targetId, follow: isFollow } = await req.json();
 
-    return request(user.id, targetId) //
-      .then((res) => NextResponse.json(res))
-      .catch((error) => new Response(JSON.stringify(error), { status: 500 }));
-  });
+  if (!targetId || isFollow === null) {
+    return new Response("Bad Request", { status: 400 });
+  }
+
+  const request = isFollow ? follow : unfollow;
+
+  return request(user.id, targetId)
+    .then((res) => NextResponse.json(res))
+    .catch((error) => new Response(JSON.stringify(error), { status: 500 }));
 }

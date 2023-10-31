@@ -1,12 +1,12 @@
 "use client";
 
-import { ProfileUser } from "@/app/model/user";
-import { CacheKeysContext } from "@/context/CacheKeyContext";
+import { CacheKeysContext } from "@/context/CacheKeysContext";
+import { ProfileUser } from "@/model/user";
 import { useState } from "react";
+import BookmarkIcon from "./atoms/icons/BookmarkIcon";
+import HeartIcon from "./atoms/icons/HeartIcon";
+import PostIcon from "./atoms/icons/PostIcon";
 import PostGrid from "./PostGrid";
-import BookmarkIcon from "./ui/icons/BookmarkIcon";
-import HeartIcon from "./ui/icons/HeartIcon";
-import PostIcon from "./ui/icons/PostIcon";
 
 interface IProps {
   user: ProfileUser;
@@ -14,22 +14,22 @@ interface IProps {
 
 const tabs = [
   { type: "posts", icon: <PostIcon /> },
-  { type: "saved", icon: <BookmarkIcon className="w-3 h-3" /> },
   { type: "liked", icon: <HeartIcon className="w-3 h-3" /> },
+  { type: "saved", icon: <BookmarkIcon className="w-3 h-3" /> },
 ];
 
 export default function UserPosts({ user: { username } }: IProps) {
   const [query, setQuery] = useState(tabs[0].type);
 
   return (
-    <section>
-      <ul className="flex justify-center uppercase">
+    <section className="mt-10">
+      <ul className="flex justify-center uppercase border-b text-neutral-400 border-b-neutral-100/20">
         {tabs.map(({ type, icon }) => (
           <li
             key={type}
             onClick={() => setQuery(type)}
-            className={`mx-12 p-4 cursor-pointer border-black ${
-              type === query && "font-bold border-t"
+            className={`p-4 cursor-pointer w-full flex justify-center ${
+              type === query && "border-b font-semibold text-neutral-100"
             }`}
           >
             <button className="scale-150 md:scale-100">{icon}</button>

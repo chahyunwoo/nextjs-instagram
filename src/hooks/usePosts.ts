@@ -1,24 +1,22 @@
-import { Comment, SimplePost } from "@/app/model/post";
-import { useCacheKeys } from "@/context/CacheKeyContext";
-import { useCallback } from "react";
+import { SimplePost, Comment } from "@/model/posts";
 import useSWR from "swr";
+import axios from "axios";
+import { useCallback } from "react";
+import { useCacheKeys } from "@/context/CacheKeysContext";
 
 async function updateLike(id: string, like: boolean) {
-  return fetch("/api/likes", {
-    method: "PUT",
-    body: JSON.stringify({ id, like }),
-  }).then((res) => res.json());
+  const response = await axios.put("/api/likes", { id, like });
+  return response.data;
 }
 
 async function addComment(id: string, comment: string) {
-  return fetch("/api/comments", {
-    method: "POST",
-    body: JSON.stringify({ id, comment }),
-  }).then((res) => res.json());
+  const response = await axios.post("/api/comments", { id, comment });
+  return response.data;
 }
 
 export default function usePosts() {
   const cacheKeys = useCacheKeys();
+
   const {
     data: posts,
     isLoading,
@@ -34,6 +32,7 @@ export default function usePosts() {
           ? [...post.likes, username]
           : post.likes.filter((item) => item !== username),
       };
+
       const newPosts = posts?.map((p) => (p.id === post.id ? newPost : p));
 
       return mutate(updateLike(post.id, like), {

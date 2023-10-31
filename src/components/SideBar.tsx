@@ -1,29 +1,27 @@
-import { AuthUser } from "@/app/model/user";
-import Avatar from "./Avatar";
+import { AuthUser } from "@/model/user";
+import Avatar from "./atoms/Avatar";
 
 interface IProps {
   user: AuthUser;
 }
 
 export default function SideBar({ user }: IProps) {
-  const { name, username, image } = user;
+  const { name, image, username } = user;
 
   return (
-    <>
-      <div className="flex items-center">
-        {image && <Avatar image={image} />}
+    <article className="hidden lg:block p-4 lg">
+      <div className="flex items-center justify-center">
+        {image && <Avatar size="large" image={image} />}
         <div className="ml-4">
-          <p className="font-bold">{username}</p>
-          <p className="text-lg text-neutral-500 leading-5">{name}</p>
+          <p className="text-sm font-semibold">{username}</p>
+          <p className="text-md text-neutral-400 leading-6">{name}</p>
         </div>
       </div>
-      <p className="text-sm text-neutral-500 mt-8">
-        About ・ Help ・ Press ・ API ・ Jobs ・ Privacy ・ Terms ・ Location ・
-        Language
+      <p className="text-xs mt-8 text-neutral-700 text-center">
+        &copy; 2023. Cha Hyun Woo.
+        <br />
+        All rights reserved.
       </p>
-      <p className="font-bold mt-8 text-sm text-neutral-500">
-        &copy; Copyright GRAM from Chahyunwoo
-      </p>
-    </>
+    </article>
   );
 }

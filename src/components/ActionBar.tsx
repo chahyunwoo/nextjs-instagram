@@ -1,23 +1,29 @@
-import { Comment, SimplePost } from "@/app/model/post";
-import useMe from "@/hooks/useMe";
+import UseMe from "@/hooks/useMe";
 import usePosts from "@/hooks/usePosts";
-import { parseDate } from "@/utils/date";
+import { Comment, SimplePost } from "@/model/posts";
+import parseDate from "@/utils/date";
+import BookmarkFillIcon from "./atoms/icons/BookmarkFillIcon";
+import BookmarkIcon from "./atoms/icons/BookmarkIcon";
+import HeartFillIcon from "./atoms/icons/HeartFillIcon";
+import HeartIcon from "./atoms/icons/HeartIcon";
 import CommentForm from "./CommentForm";
-import BookmarkFillIcon from "./ui/icons/BookmarkFillIcon";
-import BookmarkIcon from "./ui/icons/BookmarkIcon";
-import HeartFillIcon from "./ui/icons/HeartFillIcon";
-import HeartIcon from "./ui/icons/HeartIcon";
 import ToggleButton from "./ui/ToggleButton";
 
-interface Iprops {
+interface IProps {
   post: SimplePost;
-  children?: React.ReactNode;
   onComment: (comment: Comment) => void;
+  children?: React.ReactNode;
+  isBorder?: boolean;
 }
 
-export default function ActionBar({ post, children, onComment }: Iprops) {
+export default function ActionBar({
+  post,
+  children,
+  onComment,
+  isBorder = false,
+}: IProps) {
   const { id, likes, createdAt } = post;
-  const { user, setBookmark } = useMe();
+  const { user, setBookmark } = UseMe();
   const { setLike } = usePosts();
 
   const liked = user ? likes.includes(user.username) : false;
@@ -31,13 +37,13 @@ export default function ActionBar({ post, children, onComment }: Iprops) {
     user && setBookmark(id, bookmark);
   };
 
-  const handleComment = (comment: string) => {
+  const handlePostComment = (comment: string) => {
     user && onComment({ comment, username: user.username, image: user.image });
   };
 
   return (
     <>
-      <div className="flex justify-between my-2 px-4">
+      <div className="flex justify-between my-2">
         <ToggleButton
           toggled={liked}
           onToggle={handleLike}
@@ -51,16 +57,16 @@ export default function ActionBar({ post, children, onComment }: Iprops) {
           offIcon={<BookmarkIcon />}
         />
       </div>
-      <div className="px-4 py-1">
-        <p className="text-sm font-bold mb-2">{`${likes?.length ?? 0} ${
-          likes?.length > 1 ? "likes" : "like"
-        }`}</p>
+      <div className="py-1">
+        <p className="text-sm font-semibold mb-2">
+          {`${likes?.length ?? 0} ${likes?.length > 1 ? "likes" : "like"}`}
+        </p>
         {children}
-        <p className="text-xs text-neutral-500 uppercase my-2">
+        <p className="text-xs text-neutral-100/30 uppercase mb-2">
           {parseDate(createdAt)}
         </p>
       </div>
-      <CommentForm onPostComment={handleComment} />
+      <CommentForm isBorder={isBorder} onPostComment={handlePostComment} />
     </>
   );
 }

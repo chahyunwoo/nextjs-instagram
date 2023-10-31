@@ -1,19 +1,16 @@
-import { HomeUser } from "@/app/model/user";
-import { useCallback } from "react";
+import { HomeUser, SimpleUser } from "@/model/user";
 import useSWR from "swr";
+import axios from "axios";
+import { useCallback } from "react";
 
 async function updateBookmark(postId: string, bookmark: boolean) {
-  return fetch("/api/bookmarks", {
-    method: "PUT",
-    body: JSON.stringify({ id: postId, bookmark }),
-  }).then((res) => res.json());
+  const response = await axios.put("/api/bookmarks", { id: postId, bookmark });
+  return response.data;
 }
 
 async function updateFollow(targetId: string, follow: boolean) {
-  return fetch("/api/follow", {
-    method: "PUT",
-    body: JSON.stringify({ id: targetId, follow }),
-  }).then((res) => res.json());
+  const response = await axios.put("/api/follow", { id: targetId, follow });
+  return response.data;
 }
 
 export default function useMe() {

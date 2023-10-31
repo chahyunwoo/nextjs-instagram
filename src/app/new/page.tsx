@@ -1,18 +1,18 @@
 import NewPost from "@/components/NewPost";
-import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import { authOptions } from "../api/auth/[...nextauth]/route";
 
 export const metadata: Metadata = {
-  title: "New Post",
-  description: "Create a new post",
+  title: "새 포스트 작성",
+  description: "새 포스트를 작성하고 업로드 할 수 있습니다.",
 };
 
-export default async function newPage() {
+export default async function Page() {
   const session = await getServerSession(authOptions);
 
-  if (!session?.user) {
+  if (!session) {
     redirect("/auth/signin");
   }
 

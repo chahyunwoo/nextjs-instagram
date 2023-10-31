@@ -1,27 +1,38 @@
-import CloseIcon from "./ui/icons/CloseIcon";
+import useOnClickOutside from "@/hooks/useOnclickOutSide";
+import { useEffect, useRef } from "react";
+import CloseIcon from "./atoms/icons/CloseIcon";
 
 interface IProps {
   children: React.ReactNode;
-  onClose: () => void;
+  setOpenModal: (openModal: boolean) => void;
 }
 
-export default function PostModal({ onClose, children }: IProps) {
+export default function PostModal({ setOpenModal, children }: IProps) {
+  const modalRef = useRef<HTMLDivElement | null>(null);
+
+  useOnClickOutside(modalRef, () => {
+    setOpenModal(false);
+  });
+
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, []);
+
   return (
-    <section
-      className="fixed top-0 left-0 flex flex-col justify-center items-center w-full h-full z-50 bg-neutral-900/70"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) {
-          onClose();
-        }
-      }}
-    >
+    <section className="fixed top-0 left-0 w-full h-full bg-black/70 z-30 flex justify-center items-center">
       <button
-        className="fixed top-0 right-0 p-8 text-white"
-        onClick={() => onClose()}
+        className="absolute top-5 right-5"
+        onClick={() => setOpenModal(false)}
       >
         <CloseIcon />
       </button>
-      <div className="bg-white w-4/5 h-3/5 max-w-7xl">{children}</div>
+      <div className="h-auto w-3/4 bg-black" ref={modalRef}>
+        {children}
+      </div>
     </section>
   );
 }

@@ -1,3 +1,4 @@
+import BackButton from "@/components/ui/BackButton";
 import UserPosts from "@/components/UserPosts";
 import UserProfile from "@/components/UserProfile";
 import { getUserForProfile } from "@/service/user";
@@ -12,17 +13,23 @@ interface IProps {
 const getUser = cache(async (username: string) => getUserForProfile(username));
 
 export default async function Page({ params: { username } }: IProps) {
-  const user = await getUser(username);
+  const user = await getUserForProfile(username);
 
   if (!user) {
     notFound();
   }
 
   return (
-    <section className="w-full">
-      <UserProfile user={user} />
-      <UserPosts user={user} />
-    </section>
+    <>
+      <div className="fixed md:hidden w-full bg-black h-16 border-b border-b-neutral-100/20 flex items-center justify-center font-semibold">
+        <BackButton />
+        <h2>{user.username}</h2>
+      </div>
+      <div className="pt-20 md:pt-0 md:mt-10 w-full max-w-screen-lg mx-auto px-4">
+        <UserProfile user={user} />
+        <UserPosts user={user} />
+      </div>
+    </>
   );
 }
 

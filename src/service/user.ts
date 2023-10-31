@@ -1,4 +1,3 @@
-import { SearchUser } from "@/app/model/user";
 import { client } from "./sanity";
 
 interface OAuthUser {
@@ -9,9 +8,7 @@ interface OAuthUser {
   image?: string | null;
 }
 
-export async function addUser({ id, username, email, name, image }: OAuthUser) {
-  const existingUsers = await client.fetch(`*[_type == "user"]{_id}`);
-
+export async function addUser({ id, name, email, username, image }: OAuthUser) {
   return client.createIfNotExists({
     _id: id,
     _type: "user",
@@ -19,14 +16,23 @@ export async function addUser({ id, username, email, name, image }: OAuthUser) {
     email,
     name,
     image,
-    // following: []
-    following: existingUsers.map((user: { _id: string }) => ({
-      _ref: user._id,
-      _type: "reference",
-    })),
+    following: [],
     followers: [],
     bookmarks: [],
   });
+}
+
+export async function getAllUsers() {
+  return client.fetch(
+    `*[_type == "user"] {
+      "id": _id,
+      "userImage": image,
+      "username": username,
+      "name": name,
+    }`,
+    undefined,
+    { cache: "no-store" }
+  );
 }
 
 export async function getUserByUsername(username: string) {
@@ -36,36 +42,11 @@ export async function getUserByUsername(username: string) {
       "id": _id,
       following[] -> {username, image},
       followers[] -> {username, image},
-      "bookmarks": bookmarks[] -> _id
-    }`
+      "bookmarks": bookmarks[] -> _id,
+    }`,
+    undefined,
+    { cache: "no-store" }
   );
-}
-
-export async function searchUsers(keyword?: string) {
-  const query = keyword
-    ? `&& (name match "${keyword}") || (username match "${keyword}")`
-    : "";
-
-  return client
-    .fetch(
-      `*[_type =="user" ${query}]{
-      ...,
-      "following": count(following),
-      "followers": count(followers),
-    }
-    `,
-      undefined,
-      {
-        cache: "no-store",
-      }
-    )
-    .then((users) =>
-      users.map((user: SearchUser) => ({
-        ...user,
-        following: user.following ?? 0,
-        followers: user.followers ?? 0,
-      }))
-    );
 }
 
 export async function getUserForProfile(username: string) {
@@ -93,7 +74,7 @@ export async function getUserForProfile(username: string) {
 
 export async function addBookmark(userId: string, postId: string) {
   return client
-    .patch(userId) //
+    .patch(userId)
     .setIfMissing({ bookmarks: [] })
     .append("bookmarks", [
       {
@@ -109,4 +90,28 @@ export async function removeBookmark(userId: string, postId: string) {
     .patch(userId)
     .unset([`bookmarks[_ref=="${postId}"]`])
     .commit();
+}
+
+export async function follow(myId: string, targetId: string) {
+  return client
+    .transaction()
+    .patch(myId, (user) =>
+      user
+        .setIfMissing({ following: [] })
+        .append("following", [{ _ref: targetId, _type: "reference" }])
+    )
+    .patch(targetId, (user) =>
+      user
+        .setIfMissing({ followers: [] })
+        .append("followers", [{ _ref: myId, _type: "reference" }])
+    )
+    .commit({ autoGenerateArrayKeys: true });
+}
+
+export async function unfollow(myId: string, targetId: string) {
+  return client
+    .transaction()
+    .patch(myId, (user) => user.unset([`following[_ref == "${targetId}"]`]))
+    .patch(targetId, (user) => user.unset([`followers[_ref == "${myId}"]`]))
+    .commit({ autoGenerateArrayKeys: true });
 }

@@ -1,8 +1,9 @@
 "use client";
 
-import { Comment, SimplePost } from "@/app/model/post";
 import usePosts from "@/hooks/usePosts";
+import { Comment, SimplePost } from "@/model/posts";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import ActionBar from "./ActionBar";
 import PostDetail from "./PostDetail";
@@ -17,9 +18,8 @@ interface IProps {
 
 export default function PostListCard({ post, priority = false }: IProps) {
   const { userImage, username, image, comments, text } = post;
-
   const [openModal, setOpenModal] = useState(false);
-
+  const router = useRouter();
   const { postComment } = usePosts();
 
   const handlePostComment = (comment: Comment) => {
@@ -27,7 +27,7 @@ export default function PostListCard({ post, priority = false }: IProps) {
   };
 
   return (
-    <article className="rounded-lg shadow-md border border-gray-200">
+    <article className="border-b border-neutral-100/10">
       <PostUserAvatar image={userImage} username={username} />
       <Image
         className="w-full object-cover aspect-square"
@@ -36,23 +36,27 @@ export default function PostListCard({ post, priority = false }: IProps) {
         width={500}
         height={500}
         priority={priority}
-        onClick={() => setOpenModal(true)}
       />
       <ActionBar post={post} onComment={handlePostComment}>
-        <p>
-          <span className="font-bold mr-1">{username}</span>
+        <p className="mb-2">
+          <span
+            className="font-semibold mr-1 cursor-pointer"
+            onClick={() => router.push(`/user/${username}`, { scroll: false })}
+          >
+            {username}
+          </span>
           {text}
         </p>
-        {comments > 1 && (
+        {post.comments > 1 && (
           <button
-            className="font-bold my-2 text-sky-500"
+            className="text-neutral-500 mb-2"
             onClick={() => setOpenModal(true)}
           >{`View all ${comments} comments`}</button>
         )}
       </ActionBar>
       {openModal && (
         <ModalPortal>
-          <PostModal onClose={() => setOpenModal(false)}>
+          <PostModal setOpenModal={setOpenModal}>
             <PostDetail post={post} />
           </PostModal>
         </ModalPortal>

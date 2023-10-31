@@ -1,38 +1,41 @@
-import { ProfileUser } from "@/app/model/user";
-import Avatar from "./Avatar";
-import FollowButton from "./FollowButton";
+"use client";
+
+import { useResponsiveSize } from "@/hooks/useResponsiveSize";
+import { ProfileUser } from "@/model/user";
+import Avatar from "./atoms/Avatar";
+import FollowButton from "./ui/FollowButton";
 
 interface IProps {
   user: ProfileUser;
 }
 
 export default function UserProfile({ user }: IProps) {
-  const { image, username, name, followers, following, posts } = user;
+  const { username, name, image, following, followers, posts } = user;
+  const avatarSize = useResponsiveSize("xlarge", "largeplus");
 
   const info = [
-    { title: "posts", data: posts },
-    { title: "followers", data: followers },
-    { title: "following", data: following },
+    { title: "게시물", data: posts },
+    { title: "팔로워", data: followers },
+    { title: "팔로잉", data: following },
   ];
 
   return (
-    <section className="w-full flex flex-col md:flex-row items-center justify-center py-12 border-b border-neutral-300">
-      <Avatar image={image} highlight size="xlarge" />
-      <div className="md:ml-10 basis-1/3">
-        <div className="flex flex-col items-center md:flex-row">
-          <h1 className="text-2xl md:mr-8 my-2 md:my-0">{username}</h1>
-          <FollowButton user={user} />
+    <section className="w-full flex flex-col items-center">
+      <div className="flex gap-6 items-center mb-6">
+        <Avatar image={image} size={avatarSize} highlight />
+        <div>
+          <p className="font-semibold mb-2 text-lg">{username}</p>
+          <ul className="flex text-sm md:text-md gap-4 md:gap-6 mb-2">
+            {info.map(({ title, data }, index) => (
+              <li key={index}>
+                {title} <span className="font-semibold">{data}</span>
+              </li>
+            ))}
+          </ul>
+          <span className="text-neutral-400 text-sm md:text-md">{name}</span>
         </div>
-        <ul className="my-4 flex gap-4">
-          {info.map(({ title, data }, index) => (
-            <li key={index}>
-              <span className="font-bold mr-1">{data}</span>
-              {title}
-            </li>
-          ))}
-        </ul>
-        <p className="text-xl font-bold text-center md:text-start">{name}</p>
       </div>
+      <FollowButton user={user} />
     </section>
   );
 }

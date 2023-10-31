@@ -1,38 +1,55 @@
 "use client";
 
-import useMe from "@/hooks/useMe";
 import Link from "next/link";
-import { PropagateLoader } from "react-spinners";
-import Avatar from "./Avatar";
-import ScrollableBar from "./ui/ScrollableBar";
+import { ClipLoader } from "react-spinners";
+import { Swiper, SwiperSlide } from "swiper/react";
+import Avatar from "./atoms/Avatar";
+
+import "swiper/css";
+import useMe from "@/hooks/useMe";
 
 export default function FollowingBar() {
-  const { user, isLoading: loading, error } = useMe();
-
+  const { user, isLoading, error } = useMe();
   const users = user?.following;
 
   return (
-    <section className="w-full flex justify-center items-center p-4 shadow-sm shadow-neutral-300 mb-4 rounded-lg min-h-[90px] overflow-x-auto relative z-0">
-      {loading ? (
-        <PropagateLoader size={8} color="red" />
+    <section className="w-full flex justify-center items-center py-2 mb-4 min-h-[120px] border-b  border-b-neutral-100/10 overflow-x-auto">
+      {isLoading ? (
+        <ClipLoader size={40} color="darkgray" />
       ) : (
-        (!users || users.length === 0) && <p>{`You don't have following`}</p>
+        (!users || users.length === 0) && <p>No Followings</p>
       )}
       {users && users.length > 0 && (
-        <ScrollableBar>
+        <Swiper
+          slidesPerView={4}
+          scrollbar={{ draggable: true }}
+          breakpoints={{
+            576: {
+              slidesPerView: 5,
+            },
+            640: {
+              slidesPerView: 6,
+            },
+            768: {
+              slidesPerView: 8,
+            },
+          }}
+        >
           {users.map(({ image, username }) => (
-            <Link
-              key={username}
-              className="flex flex-col items-center w-20"
-              href={`/user/${username}`}
-            >
-              <Avatar image={image} highlight />
-              <p className="w-full text-sm text-center text-ellipsis overflow-hidden">
-                {username}
-              </p>
-            </Link>
+            <SwiperSlide key={username}>
+              <Link
+                className="flex flex-col items-center w-20"
+                href={`/user/${username}`}
+                scroll={false}
+              >
+                <Avatar image={image} highlight />
+                <p className="w-full text-xs mt-1 text-ellipsis overflow-hidden text-center font-thin">
+                  {username}
+                </p>
+              </Link>
+            </SwiperSlide>
           ))}
-        </ScrollableBar>
+        </Swiper>
       )}
     </section>
   );

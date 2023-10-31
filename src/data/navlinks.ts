@@ -1,22 +1,16 @@
-import HomeFillIcon from "@/components/ui/icons/HomeFillIcon";
-import HomeIcon from "@/components/ui/icons/HomeIcon";
-import NewIcon from "@/components/ui/icons/NewIcon";
-import NewFillIcon from "@/components/ui/icons/NewFillIcon";
-import SearchIcon from "@/components/ui/icons/SearchIcon";
-import SearchFillIcon from "@/components/ui/icons/SearchFillIcon";
+import { Navlink } from "@/model/navlink";
 
-export const navlinks = [
+import HomeIcon from "@/components/atoms/icons/HomeIcon";
+import NewIcon from "@/components/atoms/icons/NewIcon";
+import NewFillIcon from "@/components/atoms/icons/NewFillIcon";
+import HomeFillIcon from "@/components/atoms/icons/HomeFillIcon";
+
+export const navlinks: Navlink[] = [
   {
     name: "home",
     href: "/",
     defaultIcon: HomeIcon,
     active: HomeFillIcon,
-  },
-  {
-    name: "search",
-    href: "/search",
-    defaultIcon: SearchIcon,
-    active: SearchFillIcon,
   },
   {
     name: "new",

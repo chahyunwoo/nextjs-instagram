@@ -1,19 +1,22 @@
 "use client";
 
-import { AuthUser } from "@/app/model/user";
+import axios from "axios";
+import { AuthUser } from "@/model/user";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useRef, useState } from "react";
+import Button from "./atoms/Button";
+import FilesIcon from "./atoms/icons/FilesIcon";
 import PostUserAvatar from "./PostUserAvatar";
-import Button from "./ui/Button";
-import GridSpinner from "./ui/GridSpinner";
-import FilesIcon from "./ui/icons/FilesIcon";
+import { useRouter } from "next/navigation";
+import { ClipLoader } from "react-spinners";
 
 interface IProps {
   user: AuthUser;
 }
 
-export default function NewPost({ user: { username, image } }: IProps) {
+export default function NewPost({ user }: IProps) {
+  const { username, image } = user;
+
   const [dragging, setDragging] = useState(false);
   const [file, setFile] = useState<File>();
   const [loading, setLoading] = useState(false);
@@ -55,7 +58,7 @@ export default function NewPost({ user: { username, image } }: IProps) {
     }
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     if (!file) return;
@@ -65,24 +68,25 @@ export default function NewPost({ user: { username, image } }: IProps) {
     formData.append("file", file);
     formData.append("text", textRef.current?.value ?? "");
 
-    fetch("/api/posts/", { method: "POST", body: formData }) //
-      .then((res) => {
-        if (!res.ok) {
-          setError(`${res.status} ${res.statusText}`);
-          return;
-        }
-
-        router.push("/");
-      })
-      .catch((err) => setError(err.toString()))
-      .finally(() => setLoading(false));
+    try {
+      await axios.post("/api/posts/", formData);
+      router.push("/", { scroll: false });
+    } catch (error: any) {
+      if (error.response) {
+        setError(`${error.response.status} ${error.response.statusText}`);
+      } else {
+        setError(error.toString());
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <section className="w-full max-w-xl flex flex-col items-center mt-6">
+    <section className="w-full max-w-xl flex flex-col mx-auto items-center pt-10 px-4">
       {loading && (
-        <div className="absolute inset-0 z-20 text-center pt-[30%] bg-sky-500/20">
-          <GridSpinner />
+        <div className="fixed inset-0 z-20 text-center pt-[40%] bg-neutral-900/80">
+          <ClipLoader color="white" />
         </div>
       )}
       {error && (
@@ -91,56 +95,56 @@ export default function NewPost({ user: { username, image } }: IProps) {
         </p>
       )}
       <PostUserAvatar username={username} image={image ?? ""} />
-      <form className="w-full flex flex-col mt-2" onSubmit={handleSubmit}>
+      <form className="w-full flex flex-col mt-2 mb-20" onSubmit={handleSubmit}>
         <input
           className="hidden"
+          type="file"
           name="input"
           id="input-upload"
-          type="file"
           accept="image/*"
           onChange={handleChange}
         />
         <label
-          className={`w-full h-60 flex flex-col items-center justify-center ${
-            !file && "border-2 border-sky-500 border-dashed"
-          }`}
           htmlFor="input-upload"
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
           onDragOver={handleDragOver}
           onDrop={handleDrop}
+          className={`w-full aspect-square flex flex-col items-center justify-center ${
+            !file && "border-2 border-dashed"
+          }`}
         >
           {dragging && (
-            <div className="absolute inset-0 z-10 bg-sky-500/20 pointer-events-none" />
+            <div className="absolute inset-0 z-50 w-full h-full bg-sky-500/20 pointer-events-none" />
           )}
           {!file && (
             <div className="flex flex-col items-center pointer-events-none">
               <FilesIcon />
-              <p>Drag and Drop your image here or click</p>
+              <p className="text-xs mt-4 text-neutral-500">
+                드래그나 클릭을 해서 사진을 업로드하세요.
+              </p>
             </div>
           )}
           {file && (
-            <div className="relative w-full aspect-square">
-              <Image
-                objectFit="cover"
-                src={URL.createObjectURL(file)}
-                alt="local file"
-                fill
-                sizes="650px"
-              />
-            </div>
+            <Image
+              src={URL.createObjectURL(file)}
+              alt="local file"
+              className="w-full object-cover aspect-square"
+              width={500}
+              height={500}
+            />
           )}
         </label>
         <textarea
-          className="outline-none text-lg border border-neutral-300 mb-2 mt-20 md:mt-0"
           name="text"
           id="input-text"
           required
-          rows={10}
-          placeholder="Write  caption"
+          rows={8}
+          placeholder={"내용을 입력하세요."}
+          className="outline-none text-md bg-transparent border border-neutral-100/20 resize-none my-6 px-4 py-2 rounded-md"
           ref={textRef}
         />
-        <Button text="Publish" onClick={() => {}} />
+        <Button text="작성하기" onClick={() => {}} />
       </form>
     </section>
   );

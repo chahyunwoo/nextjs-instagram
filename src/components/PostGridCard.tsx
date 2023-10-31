@@ -1,4 +1,4 @@
-import { SimplePost } from "@/app/model/post";
+import { SimplePost } from "@/model/posts";
 import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
 import { useState } from "react";
@@ -13,12 +13,11 @@ interface IProps {
 
 export default function PostGridCard({ post, priority = false }: IProps) {
   const { image, username } = post;
+  const { data: session } = useSession();
 
   const [openModal, setOpenModal] = useState(false);
 
-  const { data: session } = useSession();
-
-  const handleOpenPost = () => {
+  const handleClick = () => {
     if (!session?.user) {
       return signIn();
     }
@@ -27,19 +26,19 @@ export default function PostGridCard({ post, priority = false }: IProps) {
   };
 
   return (
-    <div className="relative w-full aspect-square">
+    <div className="relative">
       <Image
-        className="object-cover"
         src={image}
         alt={`photo by ${username}`}
-        fill
-        sizes="650px"
+        className="object-cover w-full aspect-square"
+        width={500}
+        height={500}
         priority={priority}
-        onClick={handleOpenPost}
+        onClick={handleClick}
       />
       {openModal && (
         <ModalPortal>
-          <PostModal onClose={() => setOpenModal(false)}>
+          <PostModal setOpenModal={() => setOpenModal(false)}>
             <PostDetail post={post} />
           </PostModal>
         </ModalPortal>

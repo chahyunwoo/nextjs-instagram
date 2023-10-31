@@ -1,4 +1,4 @@
-import { getLikedOf, getPostsOf, getSavedOf } from "@/service/posts";
+import { getLikedOf, getPostsOf, getSavedOf } from "@/service/post";
 import { NextRequest, NextResponse } from "next/server";
 
 interface Context {
